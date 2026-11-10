@@ -4,6 +4,8 @@ A free, open-source **HR Admin Dashboard template** built with vanilla JavaScrip
 
 > **Zero build step.** Clone, open `index.html`, done. Perfect for HR admin panels, internal tools, or as a starter for your own dashboard projects.
 
+![Preview Dashboard](assets/img/preview.jpg)
+
 ## ✨ Features
 
 - 🎨 **Neumorphic soft-UI design** with pastel ambient background
