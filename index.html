@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hrad. — Interactive HR Admin Dashboard</title>
+  <!-- Tailwind CSS (CDN keeps the template zero-build; self-host for production) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans & Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Poppins', 'sans-serif'],
+          },
+          colors: {
+            navy: {
+              800: '#2b3654',
+              900: '#1e2740',
+            },
+            slateMuted: '#7b879c',
+            coral: '#ff7a45',
+            electric: '#3168f8',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Template styles -->
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body class="flex items-center justify-center p-0 sm:p-2 md:p-3">
+  <!-- Main Dashboard Outer Container -->
+  <div id="appShell" class="w-full h-full max-w-[1680px] bg-[#f3f5fa]/90 backdrop-blur-xl sm:rounded-[28px] shadow-[0_20px_60px_rgba(120,134,168,0.28)] border border-white flex overflow-hidden relative">
+
+    <!-- ==================== LEFT SIDEBAR ==================== -->
+    <aside id="sidebar" class="sidebar-shell w-[78px] md:w-[86px] h-full flex flex-col items-center py-5 select-none shrink-0 relative">
+      <!-- Brand Logo (wordmark text injected from assets/js/config.js) -->
+      <div class="flex flex-col items-center cursor-pointer group" onclick="switchMenu('overview')">
+        <div class="w-11 h-9 flex items-center justify-center relative">
+          <svg viewBox="0 0 60 44" class="w-10 h-8 drop-shadow-sm transition-transform duration-300 group-hover:scale-110">
+            <!-- Left Purple/Pink Triangle -->
+            <polygon points="6,36 22,8 34,36" fill="url(#gradPurple)" opacity="0.92"/>
+            <!-- Center Red/Magenta Triangle -->
+            <polygon points="18,38 31,6 45,38" fill="url(#gradPink)" opacity="0.9"/>
+            <!-- Right Orange/Amber Small Triangle -->
+            <polygon points="34,38 44,18 55,38" fill="url(#gradOrange)" opacity="0.95"/>
+            <defs>
+              <linearGradient id="gradPurple" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#8b3dff"/>
+                <stop offset="100%" stop-color="#d93870"/>
+              </linearGradient>
+              <linearGradient id="gradPink" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ff3e6c"/>
+                <stop offset="100%" stop-color="#c82864"/>
+              </linearGradient>
+              <linearGradient id="gradOrange" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#ff9a2e"/>
+                <stop offset="100%" stop-color="#ff5e3a"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="text-[16px] font-extrabold tracking-tight leading-none mt-0.5">
+          <span id="brandWordmarkBase" class="text-[#232d4b]">hr</span><span id="brandWordmarkAccent" class="text-[#e14b5a]">ad.</span>
+        </div>
+      </div>
+
+      <!-- Collapse / Expand U-Turn Arrow Button -->
+      <button id="sidebarToggleBtn" onclick="toggleSidebarExpand()" title="Expand / Collapse Sidebar" class="mt-4 mb-3 w-11 h-7 flex items-center justify-center text-[#394b72] hover:text-[#2f65f6] transition-transform duration-300">
+        <svg id="sidebarToggleIcon" viewBox="0 0 36 20" class="w-8 h-5 transition-transform duration-300" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 4H8a5 5 0 0 0-5 5v0a5 5 0 0 0 5 5h23"/>
+          <polyline points="27 10 32 14 27 18"/>
+        </svg>
+      </button>
+
+      <!-- Sidebar Navigation Menus -->
+      <nav id="sidebarNav" class="flex-1 w-full flex flex-col items-center justify-between py-1 overflow-y-auto overflow-x-hidden relative">
+        <!-- Active Gliding Indicator Pill -->
+        <div id="sidebarGlider" style="top: 10px;"></div>
+
+        <!-- Dynamic menu buttons injected by assets/js/app.js -->
+      </nav>
+
+      <!-- Bottom Scroll Hint Chevron -->
+      <button onclick="cycleNextMenu()" title="Next Menu" class="mt-2 w-8 h-6 flex flex-col items-center justify-center text-[#b0bbd0] hover:text-[#2b3654] transition-colors">
+        <span class="w-1 h-1 rounded-full bg-current mb-0.5"></span>
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT AREA ==================== -->
+    <main class="flex-1 h-full flex flex-col px-4 sm:px-6 md:px-8 pt-4 pb-3 overflow-hidden">
+
+      <!-- TOP HEADER BAR -->
+      <header class="w-full flex flex-wrap items-center justify-between gap-3 pb-3 shrink-0">
+        <!-- Left Greeting & Subtitle (injected from assets/js/config.js) -->
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 id="greetingText" class="text-[22px] sm:text-[25px] font-extrabold text-[#2b3654] tracking-tight leading-tight">
+              Hello Admin!
+            </h1>
+            <span id="liveSyncBadge" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200/60">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 badge-dot"></span>
+              Live Sync
+            </span>
+          </div>
+          <p id="greetingSubtitle" class="text-[11.5px] sm:text-[12px] text-[#7b879c] leading-[1.35] mt-0.5 max-w-[330px]">
+            Measure How Fast You're Growing Monthly Recurring<br class="hidden sm:inline"/> performance management.
+          </p>
+        </div>
+
+        <!-- Center Year Selector & Search Pill Bar -->
+        <div class="flex items-center gap-2.5 flex-1 max-w-[440px] justify-center">
+          <!-- Year Selector Pill (options populated from assets/js/config.js) -->
+          <div class="relative">
+            <select id="globalYearSelect" onchange="handleGlobalYearChange(this.value)" aria-label="Select Year" class="neu-pill appearance-none pl-4 pr-8 py-2.5 text-[12.5px] font-semibold text-[#5b6782] cursor-pointer focus:outline-none">
+            </select>
+            <div class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#7b879c] flex flex-col items-center">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 5l-4 4h8l-4-4zm0 10l4-4H6l4 4z"/></svg>
+            </div>
+          </div>
+
+          <!-- Search Input Pill -->
+          <div class="neu-pill flex-1 flex items-center px-3.5 py-2 gap-2">
+            <svg class="w-4 h-4 text-[#8c97ac] shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input id="globalSearchInput" oninput="handleGlobalSearch(this.value)" type="text" placeholder="Search menu, employees, reports..." class="w-full bg-transparent text-[12.5px] text-[#2b3654] placeholder-[#9aa5b8] focus:outline-none" />
+            <button id="clearSearchBtn" onclick="clearGlobalSearch()" class="hidden text-xs text-[#8c97ac] hover:text-[#2b3654]">✕</button>
+          </div>
+        </div>
+
+        <!-- Right Controls: Language, Messages, Notifications, Avatar -->
+        <div class="flex items-center gap-3 sm:gap-4">
+          <!-- Language Selector -->
+          <button onclick="toggleLanguage()" class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl hover:bg-white/60 transition-colors text-[12.5px] font-semibold text-[#4f5d78]">
+            <span id="langFlag" class="text-base leading-none">🇺🇸</span>
+            <span id="langLabel">English</span>
+            <svg class="w-3.5 h-3.5 text-[#7b879c]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          </button>
+
+          <!-- Messages Icon Button with Red Badge -->
+          <div class="relative">
+            <button onclick="togglePopover('msgPopover')" class="neu-btn-icon w-9 h-9 flex items-center justify-center text-[#6c7a96] relative" title="Messages">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+              </svg>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#e53e51] border-2 border-white absolute -top-0.5 -right-0.5 badge-dot"></span>
+            </button>
+          </div>
+
+          <!-- Notification Bell Button with Red Badge -->
+          <div class="relative">
+            <button onclick="togglePopover('notifPopover')" class="neu-btn-icon w-9 h-9 flex items-center justify-center text-[#6c7a96] relative" title="Notifications">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+              </svg>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#e53e51] border-2 border-white absolute -top-0.5 -right-0.5 badge-dot"></span>
+            </button>
+          </div>
+
+          <!-- Admin Profile Avatar -->
+          <button onclick="switchMenu('settings')" class="w-9 h-9 rounded-full p-0.5 bg-white shadow-md hover:scale-105 transition-transform overflow-hidden" title="Admin Profile & Settings">
+            <svg viewBox="0 0 40 40" class="w-full h-full rounded-full bg-[#e9d5c5]">
+              <circle cx="20" cy="20" r="20" fill="#f3d6c6"/>
+              <path d="M8 40 C8 29 32 29 32 40" fill="#2b3654"/>
+              <circle cx="20" cy="16" r="7.5" fill="#d9a17c"/>
+              <path d="M12 15 C12 8 28 8 28 15 C26 12 14 12 12 15 Z" fill="#3a2314"/>
+              <circle cx="17.5" cy="16" r="1" fill="#2b3654"/>
+              <circle cx="22.5" cy="16" r="1" fill="#2b3654"/>
+              <path d="M18 19.5 Q20 21 22 19.5" stroke="#2b3654" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- SUB-HEADER BAR: Dynamic Menu Title + Sub-Menu Tabs + Create Notice CTA -->
+      <div class="w-full flex flex-wrap items-center justify-between gap-2 pb-3 shrink-0">
+        <div class="flex flex-wrap items-center gap-3 sm:gap-5">
+          <!-- Active Menu Title -->
+          <div class="flex items-center gap-2.5">
+            <h2 id="currentMenuTitle" class="text-[19px] sm:text-[21px] font-extrabold text-[#2b3654] tracking-tight">
+              Overview
+            </h2>
+            <span id="menuFrameBadge" class="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-white/80 text-[#7b879c] shadow-sm border border-white" title="Ukuran setiap menu seragam & isi panjang dapat di-scroll">
+              <svg class="w-3 h-3 text-[#3168f8]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+              Uniform Scroll Frame
+            </span>
+          </div>
+
+          <!-- Sub-Menu Animated Pill Bar -->
+          <div id="subMenuTabsContainer" class="neu-inset p-1 rounded-xl flex items-center gap-1 overflow-x-auto max-w-full">
+            <!-- Populated dynamically per menu -->
+          </div>
+        </div>
+
+        <!-- Right Quick Actions & "+ Create Notice" Button -->
+        <div class="flex items-center gap-2.5">
+          <!-- Animation Style Quick Switcher (options populated from assets/js/config.js) -->
+          <div class="hidden lg:flex items-center gap-1.5 neu-pill px-2.5 py-1.5 text-[11px] font-semibold text-[#6c7a96]">
+            <span>Animasi:</span>
+            <select id="animStyleSelect" onchange="changeTransitionStyle(this.value)" class="bg-transparent text-[#2b3654] font-bold focus:outline-none cursor-pointer">
+            </select>
+          </div>
+
+          <button onclick="openCreateNoticeModal()" class="btn-create-notice text-white text-[12px] font-bold px-4 py-2 rounded-xl flex items-center gap-1.5">
+            <span class="text-sm leading-none">+</span>
+            <span>Create Notice</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ==================== UNIFORM MENU VIEWPORT STAGE ==================== -->
+      <!-- Every single menu & sub-menu shares this exact same dimensions container.
+           If content is taller than the container, .menu-scroll-viewport scrolls smoothly! -->
+      <div id="uniformMenuStage" class="uniform-menu-stage">
+        <div id="menuViewport" class="menu-scroll-viewport anim-slide-fade" onscroll="updateScrollProgress(this)">
+          <!-- Dynamic Menu & Sub-menu Content Rendered Here -->
+        </div>
+
+        <!-- Subtle Right-Side Scroll Progress Bar Indicator -->
+        <div class="pointer-events-none absolute right-0.5 top-2 bottom-2 w-1 rounded-full bg-transparent overflow-hidden">
+          <div id="scrollProgressIndicator" class="w-full bg-gradient-to-b from-[#3168f8] to-[#ff7e29] rounded-full transition-all duration-150" style="height: 0%;"></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ==================== FLOATING POPOVERS & MODALS ==================== -->
+    <!-- Messages Popover -->
+    <div id="msgPopover" class="hidden absolute top-16 right-20 w-80 neu-card p-4 z-50 border border-white">
+      <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-200/60">
+        <span class="font-bold text-sm text-[#2b3654]">Team Messages (3)</span>
+        <button onclick="togglePopover('msgPopover')" class="text-xs text-[#7b879c] hover:text-[#2b3654]">Close</button>
+      </div>
+      <div class="space-y-2.5 text-xs">
+        <div class="p-2.5 rounded-xl bg-white/80 hover:bg-white transition cursor-pointer flex gap-2.5 items-start" onclick="switchMenu('employees')">
+          <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 font-bold flex items-center justify-center shrink-0">SR</div>
+          <div>
+            <div class="font-bold text-[#2b3654]">Sarah Jenkins <span class="font-normal text-[10px] text-[#7b879c]">• 4m ago</span></div>
+            <p class="text-[#6c7a96] mt-0.5">Payroll batch for Design Team has been verified.</p>
+          </div>
+        </div>
+        <div class="p-2.5 rounded-xl bg-white/80 hover:bg-white transition cursor-pointer flex gap-2.5 items-start" onclick="switchMenu('recruitment')">
+          <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold flex items-center justify-center shrink-0">AD</div>
+          <div>
+            <div class="font-bold text-[#2b3654]">Arif Darmawan <span class="font-normal text-[10px] text-[#7b879c]">• 22m ago</span></div>
+            <p class="text-[#6c7a96] mt-0.5">3 Senior Frontend candidates scheduled for final interview.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications Popover -->
+    <div id="notifPopover" class="hidden absolute top-16 right-10 w-80 neu-card p-4 z-50 border border-white">
+      <div class="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-200/60">
+        <span class="font-bold text-sm text-[#2b3654]">System Alerts</span>
+        <button onclick="togglePopover('notifPopover')" class="text-xs text-[#7b879c] hover:text-[#2b3654]">Close</button>
+      </div>
+      <div class="space-y-2 text-xs">
+        <div class="p-2.5 rounded-xl bg-white/80 flex items-center gap-2.5 cursor-pointer" onclick="switchMenu('payroll')">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+          <span class="text-[#4f5d78]"><strong>3,458 Payrolls</strong> processed with 0 errors.</span>
+        </div>
+        <div class="p-2.5 rounded-xl bg-white/80 flex items-center gap-2.5 cursor-pointer" onclick="switchMenu('documents')">
+          <span class="w-2 h-2 rounded-full bg-amber-500 shrink-0"></span>
+          <span class="text-[#4f5d78]"><strong>10 Upcoming Holidays</strong> synced to calendar.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Create Notice Modal -->
+    <div id="createNoticeModal" class="hidden fixed inset-0 bg-[#1e2740]/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div class="neu-card w-full max-w-md p-6 relative anim-elastic">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-extrabold text-[#2b3654]">Broadcast New HR Notice</h3>
+          <button onclick="closeCreateNoticeModal()" class="neu-btn-icon w-8 h-8 flex items-center justify-center text-[#7b879c]">✕</button>
+        </div>
+        <form onsubmit="submitNewNotice(event)" class="space-y-3.5">
+          <div>
+            <label class="block text-xs font-bold text-[#5b6782] mb-1">Notice Title</label>
+            <input id="noticeTitleInput" required type="text" placeholder="e.g. Annual Performance Review Q4" class="w-full neu-inset px-3.5 py-2.5 rounded-xl text-xs text-[#2b3654] focus:outline-none" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-[#5b6782] mb-1">Target Department</label>
+              <select id="noticeDeptInput" class="w-full neu-inset px-3 py-2.5 rounded-xl text-xs text-[#2b3654] focus:outline-none">
+                <option value="All Teams">All Teams</option>
+                <option value="Developer Team">Developer Team</option>
+                <option value="Design Team">Design Team</option>
+                <option value="Marketing Team">Marketing Team</option>
+                <option value="Management Team">Management Team</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#5b6782] mb-1">Priority Tag</label>
+              <select id="noticePriorityInput" class="w-full neu-inset px-3 py-2.5 rounded-xl text-xs text-[#2b3654] focus:outline-none">
+                <option value="Important">Important (Orange)</option>
+                <option value="Announcement">Announcement (Blue)</option>
+                <option value="Holiday">Holiday (Green)</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#5b6782] mb-1">Message Summary</label>
+            <textarea id="noticeBodyInput" required rows="3" placeholder="Write announcement details for employees..." class="w-full neu-inset px-3.5 py-2.5 rounded-xl text-xs text-[#2b3654] focus:outline-none"></textarea>
+          </div>
+          <div class="flex justify-end gap-2.5 pt-2">
+            <button type="button" onclick="closeCreateNoticeModal()" class="neu-pill px-4 py-2 text-xs font-bold text-[#6c7a96]">Cancel</button>
+            <button type="submit" class="btn-create-notice text-white px-5 py-2 rounded-xl text-xs font-bold">Publish Notice</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Animated Toast Notification -->
+    <div id="toastBanner" class="pointer-events-none fixed bottom-5 right-6 z-50 transition-all duration-300 opacity-0 translate-y-4">
+      <div class="neu-card px-4 py-3 flex items-center gap-3 border border-white shadow-xl">
+        <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#ff7e29] to-[#ff9838] text-white flex items-center justify-center text-xs font-bold">✓</div>
+        <div>
+          <div id="toastTitle" class="text-xs font-extrabold text-[#2b3654]">Action Completed</div>
+          <div id="toastDesc" class="text-[11px] text-[#7b879c]">Data synced successfully.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== APPLICATION SCRIPTS (order matters) ==================== -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
